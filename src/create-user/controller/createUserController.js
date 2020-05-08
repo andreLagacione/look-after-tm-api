@@ -2,6 +2,7 @@ const db = require('../../mongo-config');
 const schema = require('../schema');
 const model = db.model('users', schema, 'users', true);
 const { crypt } = require('../../crypt');
+const { uuid } = require('../../uuid');
 
 module.exports = {
     async store(request, response) {
@@ -36,12 +37,27 @@ module.exports = {
             password: crypt(body.password)
         });
 
-        const save = await newUser.save();
+        await newUser.save();
+
+        const sessionModel = db.model('sessions');
+        const newSession = new sessionModel({
+            user: body.name,
+            email: body.email,
+            uuid: uuid(),
+            creationDate: new Date().getTime(),
+            expireDate: new Date().getTime() + 1000 * 60 * 60,
+            active: true
+        });
+
+        await newSession.save();
 
         response.json({
             httpStatus: 'OK',
             httpStatusCode: 200,
-            message: 'Success, user created!'
+            message: 'Success, user created!',
+            user: newSession.user,
+            uuid: newSession.uuid,
+            expireDate: newSession.expireDate
         });
     },
 };
