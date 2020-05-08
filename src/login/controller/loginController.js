@@ -3,6 +3,7 @@ const schema = require('../schema');
 const model = db.model('sessions', schema, 'sessions', true);
 const userModel = db.model('users')
 const { crypt } = require('../../crypt');
+const { uuid } = require('../../uuid');
 
 module.exports = {
     async store(request, response) {
@@ -31,7 +32,7 @@ module.exports = {
         const newSession = new model({
             user: user[0].name,
             email: user[0].email,
-            uuid: uuidv4(),
+            uuid: uuid(),
             creationDate: new Date().getTime(),
             expireDate: new Date().getTime() + 1000 * 60 * 60,
             active: true
@@ -68,13 +69,6 @@ const validateData = (bodyRequest) => {
     }
 
     return hasError;
-}
-
-const uuidv4 = () => {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
 }
 
 const killAllPreviousSessions = async (email) => {
