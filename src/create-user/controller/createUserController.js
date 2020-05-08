@@ -51,8 +51,6 @@ const validateData = (bodyRequest) => {
     const emailHasAt = bodyRequest.email.split('@');
     const emailHasDot = bodyRequest.email.split('.');
 
-    console.log(emailHasAt, emailHasDot);
-
     if (!bodyRequest.name) {
         message += 'The name need to be informed. ';
     }
